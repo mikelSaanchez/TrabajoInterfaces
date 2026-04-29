@@ -44,6 +44,9 @@ public class Controlador {
 
 	@FXML
 	private Label labelErrores;
+	
+	@FXML
+	private Label labelPendientes;
 
 	private TareaDAO TareaDao = new TareaDAO();
 
@@ -54,7 +57,7 @@ public class Controlador {
 		colFecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
 		colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
 		tablaRecordatorios.setItems(TareaDao.getListaTareas());
-
+		actualizarEstadisticas();
 		tablaRecordatorios.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tarea>() {
 			@Override
 			public void changed(ObservableValue<? extends Tarea> observable, Tarea anterior, Tarea seleccionado) {
@@ -89,8 +92,9 @@ public class Controlador {
 		Tarea nuevoTarea = new Tarea(nombre, descripcion, fecha, estado);
 		TareaDao.insertarTarea(nuevoTarea);
 		limpiarFormulario();
+		actualizarEstadisticas();
 		mostrarError("Tarea Insertada Correctamente", false);
-
+		
 	}
 
 	@FXML
@@ -103,6 +107,7 @@ public class Controlador {
 
 		TareaDao.borrarTarea(seleccionado);
 		mostrarError("Tarea borrada correctamente", false);
+		actualizarEstadisticas();
 	}
 
 	@FXML
@@ -119,11 +124,11 @@ public class Controlador {
 		String estado = campoEstado.getText();
 		
 		if (!TareaDao.esFechaValida(fecha)) {
-			mostrarError("Fecha inválida. Usa el formato dd/MM/yyyy.", true);
+			mostrarError("Error. Usa el formato dd/MM/yyyy.", true);
 			return;
 		}
 		if (!estado.equalsIgnoreCase("Pendiente") || estado.equalsIgnoreCase("Completada")) {
-			mostrarError("Estado inválido. Debe ser 'Pendiente' o 'Completada'.", true);
+			mostrarError("Error. Debe ser 'Pendiente' o 'Completada'.", true);
 			return;
 		}
 
@@ -132,8 +137,11 @@ public class Controlador {
 		
 		mostrarError("Tarea Modificada Correctamente", false);
 		limpiarFormulario();
-		
+		actualizarEstadisticas();
 	}
+	   private void actualizarEstadisticas() {
+		 labelPendientes.setText(String.valueOf(TareaDao.tareasPendientes()));
+	   }
 
 	private void limpiarFormulario() {
 		campoNombre.clear();

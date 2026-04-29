@@ -87,6 +87,16 @@ public class TareaDAO {
 		Tarea.setEstado(estado);
 		guardar();
 	}
+	public int tareasPendientes() {
+		int contador = 0;
+		for (Tarea t : listaTareas) {
+			if (t.getEstado().equalsIgnoreCase("Pendiente")) {
+				contador++;
+			}
+		}
+		return contador;
+	}
+	
 	public boolean esFechaValida(String fecha) {
 		if (fecha == null || fecha.isBlank())
 			return false;
