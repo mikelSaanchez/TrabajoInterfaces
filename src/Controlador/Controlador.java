@@ -44,9 +44,15 @@ public class Controlador {
 
 	@FXML
 	private Label labelErrores;
-	
+
 	@FXML
 	private Label labelPendientes;
+
+	@FXML
+	private Label labelSemana;
+	
+	@FXML
+	private Label labelPorcentaje;
 
 	private TareaDAO TareaDao = new TareaDAO();
 
@@ -84,7 +90,7 @@ public class Controlador {
 			mostrarError("Error. Usa el formato dd/MM/yyyy.", true);
 			return;
 		}
-		if (!estado.equalsIgnoreCase("Pendiente") || estado.equalsIgnoreCase("Completada")) {
+		if (!estado.equalsIgnoreCase("Pendiente") && !estado.equalsIgnoreCase("Completada")) {
 			mostrarError("Error. Debe ser 'Pendiente' o 'Completada'.", true);
 			return;
 		}
@@ -94,7 +100,7 @@ public class Controlador {
 		limpiarFormulario();
 		actualizarEstadisticas();
 		mostrarError("Tarea Insertada Correctamente", false);
-		
+
 	}
 
 	@FXML
@@ -102,6 +108,7 @@ public class Controlador {
 
 		Tarea seleccionado = tablaRecordatorios.getSelectionModel().getSelectedItem();
 		if (seleccionado == null) {
+			mostrarError("Error. Debe seleccionar una tarea.", true);
 			return;
 		}
 
@@ -122,26 +129,31 @@ public class Controlador {
 		String descripcion = campoDescripcion.getText();
 		String fecha = campoFecha.getText();
 		String estado = campoEstado.getText();
-		
+
 		if (!TareaDao.esFechaValida(fecha)) {
 			mostrarError("Error. Usa el formato dd/MM/yyyy.", true);
 			return;
 		}
-		if (!estado.equalsIgnoreCase("Pendiente") || estado.equalsIgnoreCase("Completada")) {
+
+		if (!estado.equalsIgnoreCase("Pendiente") && !estado.equalsIgnoreCase("Completada")) {
 			mostrarError("Error. Debe ser 'Pendiente' o 'Completada'.", true);
 			return;
 		}
 
 		TareaDao.actualizarTarea(seleccionado, nombre, descripcion, fecha, estado);
 		tablaRecordatorios.refresh();
-		
-		mostrarError("Tarea Modificada Correctamente", false);
+
+		labelErrores.setText("Tarea Modificada Correctamente");
+		labelErrores.setStyle("-fx-text-fill: #8000ff;");
 		limpiarFormulario();
 		actualizarEstadisticas();
 	}
-	   private void actualizarEstadisticas() {
-		 labelPendientes.setText(String.valueOf(TareaDao.tareasPendientes()));
-	   }
+
+	private void actualizarEstadisticas() {
+		labelPendientes.setText(String.valueOf(TareaDao.tareasPendientes()));
+		labelSemana.setText(String.valueOf(TareaDao.tareasSemana()));
+		labelPorcentaje.setText(String.valueOf(TareaDao.porcentajeTareas()+"%"));
+	}
 
 	private void limpiarFormulario() {
 		campoNombre.clear();
@@ -149,7 +161,7 @@ public class Controlador {
 		campoFecha.clear();
 		campoEstado.clear();
 	}
-	
+
 	private void mostrarError(String mensaje, boolean esError) {
 		labelErrores.setText(mensaje);
 		if (esError) {

@@ -21,6 +21,7 @@ public class TareaDAO {
 
 	private ObservableList<Tarea> listaTareas;
 	private DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
 	public TareaDAO() {
 		ArrayList<Tarea> tarea = cargarfichero();
 		listaTareas = FXCollections.observableArrayList(tarea);
@@ -87,6 +88,7 @@ public class TareaDAO {
 		Tarea.setEstado(estado);
 		guardar();
 	}
+
 	public int tareasPendientes() {
 		int contador = 0;
 		for (Tarea t : listaTareas) {
@@ -96,7 +98,52 @@ public class TareaDAO {
 		}
 		return contador;
 	}
-	
+
+	public int tareasSemana() {
+		LocalDate hoy = LocalDate.now();
+		LocalDate haceUnaSemana = hoy.minusDays(7);
+
+		int contador = 0;
+		for (Tarea t : listaTareas) {
+
+			String fechaTarea = t.getFecha();
+			LocalDate fechaValida = convertirFecha(fechaTarea);
+
+			if (t.getEstado().equalsIgnoreCase("Pendiente")) {
+
+				if (fechaValida.isBefore(haceUnaSemana)) {
+					contador++;
+				}
+			}
+		}
+		return contador;
+	}
+
+	public double porcentajeTareas() {
+		int totalTareas = listaTareas.size();
+		int contador = 0;
+
+		for (Tarea t : listaTareas) {
+
+			if (t.getEstado().equalsIgnoreCase("Completada")) {
+				contador++;
+			}
+		}
+		return (contador * 100) / totalTareas;
+	}
+
+	public LocalDate convertirFecha(String fecha) {
+		if (fecha == null || fecha.isBlank()) {
+			return null;
+		}
+		try {
+			LocalDate fechaConvertida = LocalDate.parse(fecha, formatoFecha);
+			return fechaConvertida;
+		} catch (DateTimeParseException e) {
+			return null;
+		}
+	}
+
 	public boolean esFechaValida(String fecha) {
 		if (fecha == null || fecha.isBlank())
 			return false;
