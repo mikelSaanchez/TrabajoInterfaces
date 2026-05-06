@@ -72,6 +72,7 @@ public class Controlador {
 					campoDescripcion.setText(seleccionado.getDescripcion());
 					campoFecha.setText(seleccionado.getFecha());
 					campoEstado.setText(seleccionado.getEstado());
+					labelErrores.setText("");
 
 				}
 			}
@@ -122,6 +123,7 @@ public class Controlador {
 		Tarea seleccionado = tablaRecordatorios.getSelectionModel().getSelectedItem();
 
 		if (seleccionado == null) {
+			mostrarError("Error. Debe seleccionar una tarea.", true);
 			return;
 		}
 

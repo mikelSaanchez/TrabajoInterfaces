@@ -105,13 +105,12 @@ public class TareaDAO {
 
 		int contador = 0;
 		for (Tarea t : listaTareas) {
-
 			String fechaTarea = t.getFecha();
 			LocalDate fechaValida = convertirFecha(fechaTarea);
 
-			if (t.getEstado().equalsIgnoreCase("Pendiente")) {
+			if (t.getEstado().equalsIgnoreCase("Completada")) {
 
-				if (fechaValida.isBefore(haceUnaSemana)) {
+				if (!fechaValida.isBefore(haceUnaSemana) && !fechaValida.isAfter(hoy)) {
 					contador++;
 				}
 			}

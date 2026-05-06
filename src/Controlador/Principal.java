@@ -14,7 +14,7 @@ public class Principal extends Application {
 		Parent root = FXMLLoader.load(getClass().getResource("../Vista/main.fxml"));
 		Scene scene = new Scene(root);
 		stage.setTitle("Recordatorios");
-		stage.getIcons().add(new Image("./Vista/icon.png")); // No va
+		stage.getIcons().add(new Image("/Vista/icon.png")); // No va
 		stage.setScene(scene);
 		stage.show();
 	}
