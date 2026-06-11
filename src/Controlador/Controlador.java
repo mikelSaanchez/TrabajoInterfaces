@@ -28,6 +28,9 @@ public class Controlador {
 	private TableColumn<Tarea, String> colEstado;
 
 	@FXML
+	private TableColumn<Tarea, String> colPrioridad;
+
+	@FXML
 	private TableView<Tarea> tablaRecordatorios;
 
 	@FXML
@@ -43,6 +46,9 @@ public class Controlador {
 	private TextField campoEstado;
 
 	@FXML
+	private TextField campoPrioridad;
+
+	@FXML
 	private Label labelErrores;
 
 	@FXML
@@ -50,9 +56,12 @@ public class Controlador {
 
 	@FXML
 	private Label labelSemana;
-	
+
 	@FXML
 	private Label labelPorcentaje;
+
+	@FXML
+	private Label labelPrioridad;
 
 	private TareaDAO TareaDao = new TareaDAO();
 
@@ -62,6 +71,7 @@ public class Controlador {
 		colDescripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
 		colFecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
 		colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+		colPrioridad.setCellValueFactory(new PropertyValueFactory<>("prioridad"));
 		tablaRecordatorios.setItems(TareaDao.getListaTareas());
 		actualizarEstadisticas();
 		tablaRecordatorios.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tarea>() {
@@ -72,6 +82,7 @@ public class Controlador {
 					campoDescripcion.setText(seleccionado.getDescripcion());
 					campoFecha.setText(seleccionado.getFecha());
 					campoEstado.setText(seleccionado.getEstado());
+					campoPrioridad.setText(seleccionado.getPrioridad());
 					labelErrores.setText("");
 
 				}
@@ -86,6 +97,7 @@ public class Controlador {
 		String descripcion = campoDescripcion.getText();
 		String fecha = campoFecha.getText();
 		String estado = campoEstado.getText();
+		String prioridad = campoPrioridad.getText();
 
 		if (!TareaDao.esFechaValida(fecha)) {
 			mostrarError("Error. Usa el formato dd/MM/yyyy.", true);
@@ -96,7 +108,12 @@ public class Controlador {
 			return;
 		}
 
-		Tarea nuevoTarea = new Tarea(nombre, descripcion, fecha, estado);
+		if (!prioridad.equalsIgnoreCase("Alta") && !prioridad.equalsIgnoreCase("Media") && !prioridad.equalsIgnoreCase("Baja")) {
+			mostrarError("Error. Debe ser 'Alta' , 'Media' o 'Baja'.", true);
+			return;
+		}
+
+		Tarea nuevoTarea = new Tarea(nombre, descripcion, fecha, estado, prioridad);
 		TareaDao.insertarTarea(nuevoTarea);
 		limpiarFormulario();
 		actualizarEstadisticas();
@@ -131,6 +148,7 @@ public class Controlador {
 		String descripcion = campoDescripcion.getText();
 		String fecha = campoFecha.getText();
 		String estado = campoEstado.getText();
+		String prioridad = campoPrioridad.getText();
 
 		if (!TareaDao.esFechaValida(fecha)) {
 			mostrarError("Error. Usa el formato dd/MM/yyyy.", true);
@@ -142,7 +160,12 @@ public class Controlador {
 			return;
 		}
 
-		TareaDao.actualizarTarea(seleccionado, nombre, descripcion, fecha, estado);
+		if (!prioridad.equalsIgnoreCase("Alta") && !prioridad.equalsIgnoreCase("Media") && !prioridad.equalsIgnoreCase("Baja")) {
+			mostrarError("Error. Debe ser 'Alta' , 'Media' o 'Baja'.", true);
+			return;
+		}
+
+		TareaDao.actualizarTarea(seleccionado, nombre, descripcion, fecha, estado, prioridad);
 		tablaRecordatorios.refresh();
 
 		labelErrores.setText("Tarea Modificada Correctamente");
@@ -154,7 +177,8 @@ public class Controlador {
 	private void actualizarEstadisticas() {
 		labelPendientes.setText(String.valueOf(TareaDao.tareasPendientes()));
 		labelSemana.setText(String.valueOf(TareaDao.tareasSemana()));
-		labelPorcentaje.setText(String.valueOf(TareaDao.porcentajeTareas()+"%"));
+		labelPorcentaje.setText(String.valueOf(TareaDao.porcentajeTareas() + "%"));
+		labelPrioridad.setText(String.valueOf(TareaDao.tareasPendientesAltas()));
 	}
 
 	private void limpiarFormulario() {
@@ -162,6 +186,7 @@ public class Controlador {
 		campoDescripcion.clear();
 		campoFecha.clear();
 		campoEstado.clear();
+		campoPrioridad.clear();
 	}
 
 	private void mostrarError(String mensaje, boolean esError) {

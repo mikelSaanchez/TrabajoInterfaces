@@ -80,12 +80,13 @@ public class TareaDAO {
 		guardar();
 	}
 
-	public void actualizarTarea(Tarea Tarea, String nombre, String descripcion, String fecha, String estado) {
+	public void actualizarTarea(Tarea Tarea, String nombre, String descripcion, String fecha, String estado, String prioridad) {
 
 		Tarea.setNombre(nombre);
 		Tarea.setDescripcion(descripcion);
 		Tarea.setFecha(fecha);
 		Tarea.setEstado(estado);
+		Tarea.setPrioridad(prioridad);
 		guardar();
 	}
 
@@ -130,6 +131,18 @@ public class TareaDAO {
 		}
 		return (contador * 100) / totalTareas;
 	}
+	
+	public int tareasPendientesAltas() {
+		int contador = 0;
+		for (Tarea t : listaTareas) {
+			if (t.getEstado().equalsIgnoreCase("Pendiente")) {
+				if(t.getPrioridad().equalsIgnoreCase("Alta")) {
+				contador++;
+				}
+			}
+		}
+		return contador;
+	}
 
 	public LocalDate convertirFecha(String fecha) {
 		if (fecha == null || fecha.isBlank()) {
@@ -153,4 +166,6 @@ public class TareaDAO {
 			return false;
 		}
 	}
+
+
 }
